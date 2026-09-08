@@ -21,7 +21,16 @@ Open http://localhost:3000
 ## Deploy
 
 Pushes to `main` deploy automatically to Vercel. Set the same two environment
-variables in the Vercel project settings.
+variables in the Vercel project settings, ticking all three environments.
+
+Two settings that are easy to get wrong:
+
+- **Framework Preset** must be Next.js. If the repo was imported while empty,
+  Vercel could not detect the framework and falls back to "Other", which fails
+  the build with `No Output Directory named "public" found`.
+- In Supabase, **Authentication → URL Configuration** needs the live Vercel URL
+  as the Site URL, with both it and `http://localhost:3000` listed as redirect
+  URLs. Otherwise confirmation emails send students to localhost.
 
 ## Project docs
 
