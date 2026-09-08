@@ -102,5 +102,17 @@ so they created a clean one. Moved profile writes to an `after insert` trigger o
 `auth.users` and removed the insert from `SignupForm.js`. Build passes. Not yet
 verified against a real signup — the owner still has to run `schema.sql`.
 
-Next: owner runs `schema.sql`, tests a real signup, then GitHub + Vercel setup.
-After that, owner shares the crux of the product.
+**Session 3 — pushed to GitHub**
+Repo is `anandgoud-rgb/level-up-ai`, private, branch `main`. First push landed all 19
+files.
+
+Cost most of a session to a GitHub gotcha worth remembering: on a fine-grained token,
+"Repository access" only chooses *which* repos are visible. It grants no abilities at
+all on its own. Without **Permissions → Contents: read and write** every push returns
+`403 Write access to repository not granted`, and the repo also 404s on the API, which
+looks exactly like the repo not existing. Note that the owner has a second, unrelated
+repo — `level-up-coding-app`, an active single-file HTML app teaching Java — that must
+never be written to from this project.
+
+Next: owner runs `schema.sql`, confirms the Vercel project is building, and shares the
+crux of the product.
