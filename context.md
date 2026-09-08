@@ -114,5 +114,21 @@ looks exactly like the repo not existing. Note that the owner has a second, unre
 repo — `level-up-coding-app`, an active single-file HTML app teaching Java — that must
 never be written to from this project.
 
-Next: owner runs `schema.sql`, confirms the Vercel project is building, and shares the
+**Session 4 — reconciled a second, un-cloned working copy against the repo**
+This session started from a local folder that had never been `git init`'d — a separate
+line of work that reinvented signup from scratch: `schema.sql` had no trigger, and
+`SignupForm.js` inserted into `profiles` directly from the browser. That only worked
+because email confirmation had been switched off in the Supabase dashboard to give the
+browser a session to insert with (worked around the exact problem session 2 already
+solved properly).
+
+Cloned `anandgoud-rgb/level-up-ai` into a subfolder, diffed it against the local
+folder, and adopted the repo's versions of `CLAUDE.md`, `README.md`,
+`app/welcome/page.js`, `components/SignupForm.js`, and `supabase/schema.sql` — the
+trigger-based approach, confirmation-safe. Moved the clone's `.git` into the working
+folder so it's now the tracked copy.
+
+Next: owner re-runs `schema.sql` (idempotent) against the live project to add the
+trigger, turns "Confirm email" back on in Supabase, then commits and pushes this
+reconciliation. After that: confirms the Vercel project is building, and shares the
 crux of the product.
