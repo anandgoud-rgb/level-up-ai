@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background-color: #eef2f7;
+  color: #12203a;
+}
+
+/* Graph-paper wash: quiet, and it reads as a notebook rather than decoration. */
+.notebook {
+  background-image: linear-gradient(
+      to right,
+      rgba(18, 32, 58, 0.045) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(18, 32, 58, 0.045) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+/* Inputs share one silhouette so the form scans as a single object. */
+.field {
+  @apply w-full rounded-xl border-2 border-line bg-white px-4 py-3 font-body text-[15px]
+         text-ink placeholder:text-inkSoft/55 transition
+         focus:border-volt focus:outline-none focus:ring-4 focus:ring-volt/15;
+}
+
+.field-invalid {
+  @apply border-[#E2445C] focus:border-[#E2445C] focus:ring-[#E2445C]/15;
+}
+
+.label {
+  @apply mb-1.5 block font-body text-[13px] font-medium text-inkSoft;
+}
+
+select.field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%234A5A75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
