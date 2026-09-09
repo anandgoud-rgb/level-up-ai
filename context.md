@@ -164,5 +164,16 @@ sign-out button; commit 4 replaces it outright.
 Verified end to end in the browser: signup, email confirmation, log out, log back in,
 landing on the placeholder `/journey`. Build passes.
 
-Next: commit 2 (append `mission_progress` table to `schema.sql`), then continue through
-the remaining commits in order.
+**Session 5 — Pre-Level brief, Commit 2: schema**
+Appended `public.mission_progress` to `schema.sql` — one row per `(user_id,
+mission_id)`, `artifact` as `jsonb` (Mission 2 stores two pastes, Mission 3 a before
+and after — a flat text column would force encoding hacks). Unlike `profiles`, there's
+a real session by the time a student writes here, so ordinary RLS policies work; no
+trigger needed.
+
+Owner ran it twice in the Supabase SQL Editor, clean both times. Table confirmed in
+Table Editor.
+
+Next: commit 3 (content model and Pre-Level content — `content/levels/00-pre-level.js`,
+`content/index.js`, the four missions), then continue through the remaining commits in
+order.

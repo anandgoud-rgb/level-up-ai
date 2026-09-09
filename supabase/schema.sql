@@ -63,3 +63,37 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Mission progress. Unlike profiles, there is a session by the time a student
+-- writes here, so ordinary RLS policies work — no trigger needed.
+
+create table if not exists public.mission_progress (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  level_id     text not null,
+  mission_id   text not null,
+  status       text not null default 'in_progress'
+               check (status in ('in_progress', 'done')),
+  artifact     jsonb,
+  xp_awarded   int  not null default 0,
+  completed_at timestamptz,
+  updated_at   timestamptz not null default now(),
+  unique (user_id, mission_id)
+);
+
+alter table public.mission_progress enable row level security;
+
+drop policy if exists "own progress read" on public.mission_progress;
+create policy "own progress read" on public.mission_progress
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "own progress write" on public.mission_progress;
+create policy "own progress write" on public.mission_progress
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "own progress update" on public.mission_progress;
+create policy "own progress update" on public.mission_progress
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create index if not exists mission_progress_user_level
+  on public.mission_progress (user_id, level_id);
