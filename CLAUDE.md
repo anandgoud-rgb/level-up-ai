@@ -50,6 +50,12 @@ The owner runs the commands; Claude does not have GitHub or Vercel access.
   server actions. `middleware.js` refreshes the session on every request and gates
   `/journey/*` and `/wall` — signed-out visitors bounce to `/login`, signed-in visitors
   bounce off `/` and `/login` to `/journey`.
+- `content/` holds only data, no JSX. A level exports `{ id, day, title, subtitle,
+  estMinutes, xp, badge, completionMessage, missions }`. Each mission's `teach` array
+  uses block types `text`, `formula`, `compare` (`callout` also supported, unused so
+  far). Prompt templates use `{{field}}` tokens resolved against the `profiles` row by
+  `content/resolveTemplate.js` — an unresolved field stays visible as `{{field}}`
+  rather than going blank.
 
 ## Design direction
 

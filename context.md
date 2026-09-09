@@ -174,6 +174,21 @@ trigger needed.
 Owner ran it twice in the Supabase SQL Editor, clean both times. Table confirmed in
 Table Editor.
 
-Next: commit 3 (content model and Pre-Level content — `content/levels/00-pre-level.js`,
-`content/index.js`, the four missions), then continue through the remaining commits in
-order.
+**Session 5 — Pre-Level brief, Commit 3: content model and Pre-Level content**
+`content/index.js` exports the ordered `journey` array; `content/levels/00-pre-level.js`
+exports the Pre-Level object with its four missions, verbatim from the brief. No JSX —
+`teach` arrays are `text` / `formula` / `compare` blocks for the mission runner
+(commit 5) to interpret. `content/resolveTemplate.js` fills `{{full_name}}` /
+`{{college}}` / `{{program}}` tokens from the `profiles` row; a missing field stays
+visible as `{{field}}` instead of going blank.
+
+The brief specified block types and level metadata but left the exact JS object shape
+for prompts/proof to this session's judgement. Chose per-mission shapes rather than
+forcing one rigid schema, since the four missions are genuinely different (single
+paste, A/B compare, stepped improve-with-chips, freeform) — flagged to the owner to
+correct if it doesn't match their mental model. Nothing renders yet; verified by
+importing the content module directly (mission count, XP sums to the level's 50,
+template resolution) rather than in the browser. Build passes.
+
+Next: commit 4 (journey map at `/journey`, replacing today's placeholder), then
+continue through the remaining commits in order.
