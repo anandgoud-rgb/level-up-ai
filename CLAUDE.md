@@ -56,6 +56,9 @@ The owner runs the commands; Claude does not have GitHub or Vercel access.
   far). Prompt templates use `{{field}}` tokens resolved against the `profiles` row by
   `content/resolveTemplate.js` — an unresolved field stays visible as `{{field}}`
   rather than going blank.
+- The journey map (`/journey`) is a zigzag node path (`components/JourneyPath.js`), not
+  a card grid — alternating left/right circular nodes connected by dashed SVG S-curves.
+  Locking is always derived from `mission_progress` at render time, never stored.
 
 ## Design direction
 

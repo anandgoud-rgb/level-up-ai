@@ -190,5 +190,25 @@ correct if it doesn't match their mental model. Nothing renders yet; verified by
 importing the content module directly (mission count, XP sums to the level's 50,
 template resolution) rather than in the browser. Build passes.
 
-Next: commit 4 (journey map at `/journey`, replacing today's placeholder), then
-continue through the remaining commits in order.
+**Session 5 — Pre-Level brief, Commit 4: journey map**
+`/journey` (the commit 1 placeholder) is now the real map: one Supabase query for the
+profile, one for all `mission_progress` rows, then levels are derived — a level is
+available once every mission in the preceding level is `done`; Pre-Level is always
+available. No `locked` column, by design, so reordering content never goes stale.
+Header shows first name, total XP, and earned badges. Challenges 1-5 render as muted
+"Coming soon" placeholders (`app/journey/page.js`), since they aren't written yet.
+
+Went through two rounds of visual iteration with the owner: started as a plain card
+grid, then to a zigzag node path per the owner's "like an actual game map" request
+(`components/JourneyPath.js` — alternating left/right circular nodes), then fixed a
+connector bug where the dashed line ran straight down the center regardless of node
+position — it now bends as a dashed SVG S-curve between each pair of nodes, following
+the zigzag.
+
+Clicking "Start" on Pre-Level currently 404s — the mission runner route
+(`/journey/[levelId]/[missionId]`) is commit 5, not built yet. Expected at this stage.
+Verified in-browser (logged-in test account): name, XP, Pre-Level node, five muted
+placeholders. Build passes.
+
+Next: commit 5 (mission runner), then commit 6 (rewards). The owner wants to pause
+after this deploy to discuss what else needs building before continuing.
