@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase, supabaseReady } from "@/lib/supabaseClient";
+import Link from "next/link";
+import { createClient, supabaseReady } from "@/lib/supabase/client";
 import PlayerCard from "./PlayerCard";
 
 const PROGRAMS = ["Science", "Commerce", "Arts"];
@@ -34,6 +35,10 @@ function validate(v) {
 
 export default function SignupForm() {
   const router = useRouter();
+  const supabase = useMemo(
+    () => (supabaseReady ? createClient() : null),
+    []
+  );
   const [values, setValues] = useState(EMPTY);
   const [touched, setTouched] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -264,7 +269,13 @@ export default function SignupForm() {
         </button>
 
         <p className="mt-4 font-body text-[13px] text-inkSoft">
-          Already signed up? Ask your instructor for the login link.
+          Already signed up?{" "}
+          <Link
+            href="/login"
+            className="font-semibold text-volt underline underline-offset-2 hover:text-voltDeep"
+          >
+            Log in
+          </Link>
         </p>
       </div>
 

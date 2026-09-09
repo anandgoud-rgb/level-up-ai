@@ -45,6 +45,11 @@ The owner runs the commands; Claude does not have GitHub or Vercel access.
   `supabase/schema.sql`. Miss one and the field silently vanishes.
 - `schema.sql` must stay re-runnable. Use `if not exists`, `drop policy if exists`,
   and `create or replace`.
+- Auth: `lib/supabase/client.js` (`createClient()`) in client components,
+  `lib/supabase/server.js` (`createClient()`, cookie-bound) in server components and
+  server actions. `middleware.js` refreshes the session on every request and gates
+  `/journey/*` and `/wall` — signed-out visitors bounce to `/login`, signed-in visitors
+  bounce off `/` and `/login` to `/journey`.
 
 ## Design direction
 
