@@ -152,9 +152,14 @@ export default function MissionRunner({
   savedArtifact,
   savedStatus,
   nextMissionId,
+  levelXp,
+  levelBadge,
+  completionMessage,
 }) {
   const router = useRouter();
   const supabase = useMemo(() => (supabaseReady ? createClient() : null), []);
+  const [reveal, setReveal] = useState(false);
+  const [revealVisible, setRevealVisible] = useState(false);
 
   const initialValues = useMemo(() => {
     const v = {};
@@ -213,7 +218,19 @@ export default function MissionRunner({
     setStatus("done");
     await saveProgress("done", mission.xp, values);
     setSaving(false);
-    router.push(nextMissionId ? `/journey/${levelId}/${nextMissionId}` : "/journey");
+
+    if (nextMissionId) {
+      router.push(`/journey/${levelId}/${nextMissionId}`);
+      return;
+    }
+
+    // Last mission in the level — hold on a badge reveal before routing back.
+    setReveal(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setRevealVisible(true)));
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => router.push("/journey"), reduceMotion ? 50 : 1800);
   }
 
   const canContinue = isProofComplete(mission.proof, values);
@@ -363,6 +380,47 @@ export default function MissionRunner({
           {saving ? "Saving…" : "Continue"}
         </button>
       </div>
+
+      {reveal ? (
+        <div
+          className={`fixed inset-0 z-50 grid place-items-center bg-ink/90 px-5 transition-opacity duration-300 ${
+            revealVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div
+            className={`w-full max-w-sm rounded-3xl border-2 border-ink bg-white p-8 text-center shadow-card transition-all duration-300 ${
+              revealVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
+            }`}
+          >
+            <div className="mx-auto grid h-20 w-20 place-items-center rounded-full border-2 border-ink bg-mint text-ink">
+              <svg width="34" height="34" viewBox="0 0 22 22" fill="none" aria-hidden>
+                <path
+                  d="M5 11.5l4 4 8-9"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            {levelBadge ? (
+              <p className="mt-5 inline-block rounded-full border-2 border-ink bg-mint px-4 py-1.5 font-body text-sm font-semibold text-ink">
+                {levelBadge.name}
+              </p>
+            ) : null}
+            {levelXp ? (
+              <p className="mt-3 font-display text-2xl font-extrabold text-ink">
+                +{levelXp} XP
+              </p>
+            ) : null}
+            {completionMessage ? (
+              <p className="mt-4 font-body text-[15px] leading-relaxed text-inkSoft">
+                {completionMessage}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

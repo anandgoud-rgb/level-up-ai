@@ -56,6 +56,9 @@ export default async function MissionPage({ params }) {
       savedArtifact={progressRow?.artifact ?? {}}
       savedStatus={progressRow?.status ?? "in_progress"}
       nextMissionId={nextMission?.id ?? null}
+      levelXp={level.xp}
+      levelBadge={level.badge}
+      completionMessage={level.completionMessage}
     />
   );
 }

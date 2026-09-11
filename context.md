@@ -241,6 +241,17 @@ Verified end to end in the owner's real account: all 4 Pre-Level missions playab
 progress and XP survive revisits, journey map reflects 50 XP / badge / Review. Build
 passes.
 
-Next: commit 6 (rewards — badge reveal moment, closing line, route back to `/journey`
-on level completion). The owner wants to pause after this deploy to discuss what else
-needs building before continuing.
+**Session 6 — Pre-Level brief, Commit 6: rewards (badge reveal + closing line)**
+The last gap from Commit 6: `level.completionMessage` existed in content but was never
+shown anywhere. Finishing the level's last mission now holds on a brief overlay
+(mint checkmark circle, the level's badge name, `+{xp} XP`, and the closing line) for
+1.8s before routing to `/journey` — skipped down to ~instant if the browser has
+`prefers-reduced-motion` set. Verified the exact rendered text via the live DOM in the
+owner's account (`AI Co-Pilot` / `+50 XP` / `You are ready to build something real.`)
+after screenshot timing proved too slow to reliably catch a sub-2-second overlay
+mid-flight. Build passes.
+
+Next: the owner handed over the Level 1 brief ("Build Your Own") — nine challenge
+templates, one chosen per student, four days of content reused across nine mission
+templates. Day/pacing metadata exists in code only for internal reference; never
+surfaced to students. Working through its six commits in order.
