@@ -264,5 +264,28 @@ without a migration, `locked_at` for the mission-02 challenge lock. Same RLS sha
 `mission_progress`: ordinary policies, no trigger, since there's a session by the time
 a student writes here. Owner ran it twice in the Supabase SQL editor, clean both times.
 
-Next: commit 2 (content — nine challenge vocabulary files, nine mission templates,
-`BUILD_CONSTRAINTS`).
+**Session 6 — Level 1 brief, Commit 2: content**
+`content/level-1/missions.js` (9 shared templates, tokens unresolved until commit 3),
+`content/level-1/challenges/*.js` (9 vocabulary files), `content/level-1/index.js`
+(aggregates both, `getChallenge(id)`, level metadata). XP sums to the specified 200.
+No badge on the level object — it's per challenge, read from the student's chosen
+`builds.challenge_id` at completion time.
+
+Three small gaps the brief didn't fully specify, filled in with a reasonable default —
+flagging in case any should be different:
+- Mission 01's `audience` field was meant to prefill with "their college city," but
+  `profiles` only stores the college's name, not a city. Left unprefilled.
+- Mission 05's proof paste has no minimum length in the brief. Set to 60, matching the
+  other same-weight missions.
+- `BUILD_CONSTRAINTS` is appended only to mission 02's prompt (literally as instructed
+  there), not repeated on missions 03-08 — those stay in the same chat where the
+  one-file/inline/mobile-friendly pattern is already established, and repeating the
+  full constraint block in every two-line prompt would defeat the "short prompt"
+  design goal the brief itself sets out.
+
+Verified all 9 mission templates and 9 challenge files import cleanly and check out
+structurally (XP totals, 4 wowIdeas each, non-empty extraPages/filterIdeas, valid
+badges) via a Node script, since nothing renders yet — Commit 4 (picker) is the first
+place this content actually shows up. Build passes.
+
+Next: commit 3 (`lib/prompt.js` — the token resolver, strict on missing tokens).
