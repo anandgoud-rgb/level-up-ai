@@ -369,5 +369,23 @@ after 1 only depends on mission 1's answers). Ran into repeated session
 expiry mid-testing (re-logged in twice) — unrelated to this commit, same as a similar
 one-off in an earlier session. Build passes.
 
-Next: commit 6 (rewards — 200 XP + per-challenge badge + closing line on finishing
-mission 9, same reveal-moment pattern as Pre-Level's commit 6).
+**Session 6 — Level 1 brief, Commit 6: rewards**
+Same reveal mechanic as Pre-Level's commit 6 (mint-circle-style overlay, 1.8s hold,
+skips to instant under `prefers-reduced-motion`), added to `Level1MissionRunner`'s
+`handleContinue` for the last mission. Uses the chosen challenge's own icon and badge
+name instead of a generic checkmark — nine distinct badges, matching the brief's "more
+fun and instantly readable" reasoning. `level1.completionMessage` ("You built a real
+product today.") added to content. XP (200) and badge derivation were already correct
+from commit 4's `earnedBadges` logic on `/journey`; this only adds the missing
+in-mission celebration moment.
+
+Not live-tested end to end — reaching mission 9 needs 6 more mission completions
+through a browser session that's already hit repeated auth expiry this session.
+Relying instead on: code symmetry with Pre-Level's reveal (already verified live),
+and confirming via the commit 2 test script that all 9 challenges have valid
+`icon`/`badge.name`, `level1.xp` is 200, and `completionMessage` is a plain string
+(no risk of an undefined-prop crash). Build passes. Recommend the owner runs one full
+mission 1-9 playthrough before this reaches students.
+
+**Level 1 brief complete** — all 6 commits done: schema, content, resolver, picker,
+runner, rewards.

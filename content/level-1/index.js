@@ -36,6 +36,7 @@ export const level1 = {
   title: "Build Your Own",
   subtitle: "Nine challenges. Pick one to build.",
   requiresChallenge: true,
+  completionMessage: "You built a real product today.",
   xp: totalXp,
   estMinutes: totalMinutes,
   missions,

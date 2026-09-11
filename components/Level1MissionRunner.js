@@ -145,10 +145,14 @@ export default function Level1MissionRunner({
   savedArtifact,
   savedStatus,
   nextMissionId,
+  levelXp,
+  completionMessage,
 }) {
   const router = useRouter();
   const supabase = useMemo(() => (supabaseReady ? createClient() : null), []);
   const context = { challenge, student, build: buildAnswers };
+  const [reveal, setReveal] = useState(false);
+  const [revealVisible, setRevealVisible] = useState(false);
 
   const [answers, setAnswers] = useState(buildAnswers);
   const [proofValues, setProofValues] = useState(() => {
@@ -252,9 +256,19 @@ export default function Level1MissionRunner({
       persistProgress("done", mission.xp, proofValues),
     ]);
     setSaving(false);
-    router.push(
-      nextMissionId ? `/journey/level-1/${nextMissionId}` : "/journey"
-    );
+
+    if (nextMissionId) {
+      router.push(`/journey/level-1/${nextMissionId}`);
+      return;
+    }
+
+    // Last mission in the level — hold on a badge reveal before routing back.
+    setReveal(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setRevealVisible(true)));
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => router.push("/journey"), reduceMotion ? 50 : 1800);
   }
 
   function livePreview(template) {
@@ -431,6 +445,37 @@ export default function Level1MissionRunner({
           {saving ? "Saving…" : "Continue"}
         </button>
       </div>
+
+      {reveal ? (
+        <div
+          className={`fixed inset-0 z-50 grid place-items-center bg-ink/90 px-5 transition-opacity duration-300 ${
+            revealVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div
+            className={`w-full max-w-sm rounded-3xl border-2 border-ink bg-white p-8 text-center shadow-card transition-all duration-300 ${
+              revealVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
+            }`}
+          >
+            <p className="text-4xl">{challenge.icon}</p>
+            {challenge.badge ? (
+              <p className="mt-5 inline-block rounded-full border-2 border-ink bg-mint px-4 py-1.5 font-body text-sm font-semibold text-ink">
+                {challenge.badge.name}
+              </p>
+            ) : null}
+            {levelXp ? (
+              <p className="mt-3 font-display text-2xl font-extrabold text-ink">
+                +{levelXp} XP
+              </p>
+            ) : null}
+            {completionMessage ? (
+              <p className="mt-4 font-body text-[15px] leading-relaxed text-inkSoft">
+                {completionMessage}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
