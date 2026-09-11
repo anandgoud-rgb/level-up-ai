@@ -251,7 +251,18 @@ owner's account (`AI Co-Pilot` / `+50 XP` / `You are ready to build something re
 after screenshot timing proved too slow to reliably catch a sub-2-second overlay
 mid-flight. Build passes.
 
-Next: the owner handed over the Level 1 brief ("Build Your Own") — nine challenge
-templates, one chosen per student, four days of content reused across nine mission
-templates. Day/pacing metadata exists in code only for internal reference; never
-surfaced to students. Working through its six commits in order.
+Next: the owner handed over the Level 1 brief ("Build Your Own") — nine challenges
+(zomato, zepto, amazon, youtube, spotify, netflix, instagram, makemytrip, muscleblaze),
+one chosen per student, built via nine shared mission templates whose tokens each
+challenge file fills in. Day/pacing metadata is for internal understanding only —
+never surfaced to students. Working through its six commits in order.
+
+**Session 6 — Level 1 brief, Commit 1: schema**
+Appended `public.builds` to `schema.sql` — one row per student (`user_id` is the
+primary key, not a separate id column), `answers` jsonb so later missions can add keys
+without a migration, `locked_at` for the mission-02 challenge lock. Same RLS shape as
+`mission_progress`: ordinary policies, no trigger, since there's a session by the time
+a student writes here. Owner ran it twice in the Supabase SQL editor, clean both times.
+
+Next: commit 2 (content — nine challenge vocabulary files, nine mission templates,
+`BUILD_CONSTRAINTS`).

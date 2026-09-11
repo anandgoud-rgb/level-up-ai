@@ -97,3 +97,31 @@ create policy "own progress update" on public.mission_progress
 
 create index if not exists mission_progress_user_level
   on public.mission_progress (user_id, level_id);
+
+-- Level 1 ("Build Your Own"). One row per student — one build, as specified.
+-- `answers` accumulates across missions; a mission can add a new key without a
+-- migration. There is a session by the time a student writes here, same as
+-- mission_progress, so ordinary RLS policies work.
+
+create table if not exists public.builds (
+  user_id      uuid primary key references auth.users(id) on delete cascade,
+  challenge_id text not null,
+  answers      jsonb not null default '{}'::jsonb,
+  locked_at    timestamptz,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+alter table public.builds enable row level security;
+
+drop policy if exists "own build read" on public.builds;
+create policy "own build read" on public.builds
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "own build write" on public.builds;
+create policy "own build write" on public.builds
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "own build update" on public.builds;
+create policy "own build update" on public.builds
+  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
