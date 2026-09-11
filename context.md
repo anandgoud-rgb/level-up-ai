@@ -210,5 +210,37 @@ Clicking "Start" on Pre-Level currently 404s — the mission runner route
 Verified in-browser (logged-in test account): name, XP, Pre-Level node, five muted
 placeholders. Build passes.
 
-Next: commit 5 (mission runner), then commit 6 (rewards). The owner wants to pause
-after this deploy to discuss what else needs building before continuing.
+**Session 5 — Pre-Level brief, Commit 5: mission runner**
+`app/journey/[levelId]/[missionId]/page.js` (server component: resolves level/mission
+from content, loads profile + any existing `mission_progress` row) plus
+`components/MissionRunner.js` (client component: renders `teach` blocks, prompt
+panel(s) with copy buttons and an Open Claude link, the proof field(s), and Continue).
+Saves on every field blur, upserting `mission_progress` on `(user_id, mission_id)`;
+Continue marks the mission `done` and awards its XP, then routes to the next mission
+or back to `/journey` if it was the last one.
+
+Mission shapes ended up meaningfully different (single paste, A/B compare, stepped
+improve-with-chips, freeform-with-starter-chips), so the runner branches on structural
+signals in the content (presence of `prompt` vs `prompts`, `proof.mode`, presence of
+`improvementChips`/`starterChips`) rather than checking mission IDs — keeps it
+data-driven for whatever content comes next.
+
+The owner reported Mission 4 being skipped after Mission 3's Continue. Investigated
+live in the owner's own account via browser automation (logged into their test
+account) rather than guessing from code alone: revisited Mission 3 and clicked
+Continue — it correctly loaded Mission 4; completing Mission 4 correctly brought the
+level to 50 XP with the AI Co-Pilot badge and "Review" on the map. Could not reproduce
+the bug; the account is genuinely fully complete now. Did surface one real gap while
+reviewing: `saveProgress` swallows write failures silently and `handleContinue`
+navigates forward regardless of whether the save succeeded, so a network hiccup at the
+exact moment of clicking Continue could silently lose that completion. Proposed a
+fix (block navigation and show an inline error on Continue-save failure); owner
+decided it's not worth doing right now — left as is, silent-and-continue.
+
+Verified end to end in the owner's real account: all 4 Pre-Level missions playable,
+progress and XP survive revisits, journey map reflects 50 XP / badge / Review. Build
+passes.
+
+Next: commit 6 (rewards — badge reveal moment, closing line, route back to `/journey`
+on level completion). The owner wants to pause after this deploy to discuss what else
+needs building before continuing.

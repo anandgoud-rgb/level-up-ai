@@ -59,6 +59,12 @@ The owner runs the commands; Claude does not have GitHub or Vercel access.
 - The journey map (`/journey`) is a zigzag node path (`components/JourneyPath.js`), not
   a card grid — alternating left/right circular nodes connected by dashed SVG S-curves.
   Locking is always derived from `mission_progress` at render time, never stored.
+- The mission runner (`app/journey/[levelId]/[missionId]/page.js` +
+  `components/MissionRunner.js`) upserts `mission_progress` on `(user_id, mission_id)`
+  on every field blur (autosave, silent on failure — the next blur retries) and again
+  on Continue (marks `done`, awards `xp_awarded`). A save failure on Continue is
+  intentionally left silent too, by owner's call — it still navigates forward even if
+  the write failed.
 
 ## Design direction
 
