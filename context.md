@@ -331,6 +331,43 @@ Pre-Level runner — showing raw `{{challenge.domain}}`-style unresolved tokens,
 as expected since the new token syntax and input fields aren't wired into the runner
 until commit 5; switching to Zepto updates "Your pick" correctly. Build passes.
 
-Next: commit 5 (runner extensions — input fields, chips, checklist, live prompt
-preview, wiring `lib/prompt.js` into the runner, setting `builds.locked_at` on mission
-2 completion). This is the substantial one per the brief.
+**Session 6 — Level 1 brief, Commit 5: runner extensions**
+`app/journey/level-1/[missionId]/page.js` — a *more specific static route* than the
+generic `app/journey/[levelId]/[missionId]`, which Next.js routes to automatically
+ahead of the dynamic one. Pre-Level's runner is completely untouched; Level 1 gets its
+own `components/Level1MissionRunner.js`. Page-level, before rendering anything: tries
+resolving every token the mission's title/prompt/checklist reference via
+`lib/prompt.js`, skipping any `build.*` key the mission collects itself (those start
+blank, filled live) — a genuinely missing token (an earlier mission not yet done)
+shows a plain "this needs something from &lsquo;X&rsquo; first" screen instead of a
+broken prompt, per the brief's strict-resolver requirement.
+
+Runner handles: `inputs` (line / chips-single / chips-or-custom, live-updating a
+prompt preview the same way signup's player card fills in — unresolved self-fields
+show as `___`, not blank or broken syntax), `postInputs` (recorded after the prompt,
+e.g. mission 1's palette), `checklist` (mission 8, gates Continue same as proof
+minLengths), and a new `showcase` proof mode (mission 9's three fields). Two separate
+tables get written: `mission_progress` (per-mission artifact/status/xp, same shape as
+Pre-Level) and `builds.answers` (accumulates across missions, one upsert of the whole
+answers object per save — call sites always seed from the latest known state so
+earlier missions' keys are never dropped). Completing `build-the-foundation`
+(mission 2) also sets `builds.locked_at`, which is what makes the picker show its
+locked view from commit 4.
+
+Live-verified in the owner's account (missions 1-3, in order, for real): input fields
++ live preview updating correctly as fields were typed and a mood chip picked;
+mission 2's prompt fully resolved every mission-1 answer plus `BUILD_CONSTRAINTS`
+appended; mission 3's title and filter list resolved `{{challenge.x}}` tokens
+including array-join prose; proof correctly re-hydrates on revisiting a mission;
+completing mission 2 set the lock and the picker's condensed view + "Continue
+building" appeared immediately after; XP and mission-count on `/journey` tracked
+correctly throughout (115 XP = 50 + 15 + 25 + 25, "3/9 missions"). Not live-tested,
+relying on code review and the already-verified shared patterns: mission 7's
+chips-or-custom input, mission 8's checklist gating, mission 9's showcase proof mode,
+and the not-ready redirect screen itself (never actually hit one, since every mission
+after 1 only depends on mission 1's answers). Ran into repeated session
+expiry mid-testing (re-logged in twice) — unrelated to this commit, same as a similar
+one-off in an earlier session. Build passes.
+
+Next: commit 6 (rewards — 200 XP + per-challenge badge + closing line on finishing
+mission 9, same reveal-moment pattern as Pre-Level's commit 6).
