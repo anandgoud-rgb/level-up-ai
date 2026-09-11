@@ -34,6 +34,8 @@ export const level1 = {
   id: "level-1",
   day: 1,
   title: "Build Your Own",
+  subtitle: "Nine challenges. Pick one to build.",
+  requiresChallenge: true,
   xp: totalXp,
   estMinutes: totalMinutes,
   missions,

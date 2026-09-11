@@ -305,5 +305,32 @@ string/empty array all throw, dynamic tokens inside mission titles resolve corre
 `npm run build` confirms the real file's `@/content/level-1/missions` import compiles.
 Build passes.
 
-Next: commit 4 (`/journey/level-1` challenge picker — nine cards, selection writes the
-`builds` row, change-challenge lock after mission 02).
+**Session 6 — Level 1 brief, Commit 4: challenge picker**
+`content/index.js` now exports `[preLevel, level1]` — Level 1 is a real node on the
+journey path. Its journey-map card shows "Choose" until a `builds` row exists, then
+routes straight to the right mission like any other level; remaining not-yet-built
+levels renamed placeholder "Challenge N" &rarr; "Level N" to stop colliding with the
+nine in-level challenge names (Zomato, Zepto, etc.).
+
+`app/journey/level-1/page.js` + `components/ChallengePicker.js`: nine cards (icon,
+name, tagline, a page list synthesized from each challenge's `discoveryName` /
+`detailName` / `extraPages`). No build yet &rarr; pick writes the row and redirects
+into mission 1. Build exists, unlocked &rarr; the current pick shows "Your pick" with
+a plain Continue; every other card offers "Switch to this," which shows an inline
+confirm (not a native `confirm()`) before calling the `selectChallenge` server action
+— that action also deletes any `level-1` `mission_progress` rows first, since a
+switch is only reachable before mission 2 locks it, so at most mission 1's row could
+exist and its answers describe the old pick. Locked (`builds.locked_at` set) &rarr;
+condensed view, just the chosen challenge and a Continue link — nothing here sets
+`locked_at` yet, that's commit 5's job when it builds mission 2's completion.
+
+Verified live end to end in the owner's account: journey map shows "0/9 missions,
+~160 min, 200 XP, Choose"; all 9 cards render correctly; picking Zomato writes the
+build and lands on `/journey/level-1/choose-your-brand`, rendered by the *unmodified*
+Pre-Level runner — showing raw `{{challenge.domain}}`-style unresolved tokens, exactly
+as expected since the new token syntax and input fields aren't wired into the runner
+until commit 5; switching to Zepto updates "Your pick" correctly. Build passes.
+
+Next: commit 5 (runner extensions — input fields, chips, checklist, live prompt
+preview, wiring `lib/prompt.js` into the runner, setting `builds.locked_at` on mission
+2 completion). This is the substantial one per the brief.

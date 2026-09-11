@@ -1,13 +1,14 @@
 import { createClient, supabaseReady } from "@/lib/supabase/server";
 import { journey } from "@/content";
+import { getChallenge } from "@/content/level-1";
 import { signOut } from "@/app/actions/auth";
 import JourneyPath from "@/components/JourneyPath";
 
-// Challenges 1-5 aren't written yet. Placeholders keep the shape of the three
-// days visible from day one — see content/index.js.
-const CHALLENGE_PLACEHOLDERS = [1, 2, 3, 4, 5].map((n) => ({
-  id: `challenge-${n}`,
-  title: `Challenge ${n}`,
+// Levels 2-5 aren't written yet. Placeholders keep the shape of the journey
+// visible from day one — see content/index.js.
+const LEVEL_PLACEHOLDERS = [2, 3, 4, 5].map((n) => ({
+  id: `level-${n}`,
+  title: `Level ${n}`,
 }));
 
 export default async function JourneyPage() {
@@ -28,12 +29,13 @@ export default async function JourneyPage() {
 
   if (!user) return null;
 
-  const [{ data: profile }, { data: progressRows }] = await Promise.all([
+  const [{ data: profile }, { data: progressRows }, { data: build }] = await Promise.all([
     supabase.from("profiles").select("full_name").eq("id", user.id).single(),
     supabase
       .from("mission_progress")
       .select("level_id, mission_id, status, xp_awarded")
       .eq("user_id", user.id),
+    supabase.from("builds").select("challenge_id").eq("user_id", user.id).maybeSingle(),
   ]);
 
   const progress = progressRows ?? [];
@@ -62,25 +64,46 @@ export default async function JourneyPage() {
           !levelProgress.some((r) => r.mission_id === m.id && r.status === "done")
       ) ?? level.missions[0];
 
+    // A level that requires picking a challenge first sends the student to
+    // the picker until a build row exists, then behaves like any other level.
+    const needsPick = level.requiresChallenge && !build;
+    const href = needsPick
+      ? `/journey/${level.id}`
+      : `/journey/${level.id}/${nextMission.id}`;
+
     return {
       ...level,
       isComplete,
       locked,
       lockedReason,
       missionsDone,
-      href: `/journey/${level.id}/${nextMission.id}`,
-      ctaLabel: missionsDone === 0 ? "Start" : isComplete ? "Review" : "Continue",
+      href,
+      ctaLabel: needsPick
+        ? "Choose"
+        : missionsDone === 0
+        ? "Start"
+        : isComplete
+        ? "Review"
+        : "Continue",
     };
   });
 
   const totalXp = progress.reduce((sum, r) => sum + (r.xp_awarded || 0), 0);
-  const earnedBadges = levels.filter((l) => l.isComplete).map((l) => l.badge);
+  const chosenChallenge = build ? getChallenge(build.challenge_id) : null;
+  const earnedBadges = levels
+    .filter((l) => l.isComplete)
+    .map((l) => (l.requiresChallenge ? chosenChallenge?.badge : l.badge))
+    .filter(Boolean);
 
   const stops = [
     ...levels.map((level) => ({
       id: level.id,
-      title: level.title,
-      subtitle: level.subtitle,
+      title:
+        level.requiresChallenge && chosenChallenge ? chosenChallenge.name : level.title,
+      subtitle:
+        level.requiresChallenge && chosenChallenge
+          ? chosenChallenge.tagline
+          : level.subtitle,
       xp: level.xp,
       estMinutes: level.estMinutes,
       isComplete: level.isComplete,
@@ -92,7 +115,7 @@ export default async function JourneyPage() {
       ctaLabel: level.ctaLabel,
       placeholder: false,
     })),
-    ...CHALLENGE_PLACEHOLDERS.map((c) => ({
+    ...LEVEL_PLACEHOLDERS.map((c) => ({
       id: c.id,
       title: c.title,
       placeholder: true,

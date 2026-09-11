@@ -1,6 +1,6 @@
 import { preLevel } from "./levels/00-pre-level";
+import { level1 } from "./level-1";
 
-// Ordered journey. Challenges 1-5 aren't written yet — the journey map (commit 4)
-// renders them as "Coming soon" placeholders derived from this being the only
-// real level so far.
-export const journey = [preLevel];
+// Ordered journey. Challenges 2-5 aren't written yet — the journey map renders
+// them as "Coming soon" placeholders.
+export const journey = [preLevel, level1];
