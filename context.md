@@ -288,4 +288,22 @@ structurally (XP totals, 4 wowIdeas each, non-empty extraPages/filterIdeas, vali
 badges) via a Node script, since nothing renders yet — Commit 4 (picker) is the first
 place this content actually shows up. Build passes.
 
-Next: commit 3 (`lib/prompt.js` — the token resolver, strict on missing tokens).
+**Session 6 — Level 1 brief, Commit 3: resolver**
+`lib/prompt.js` exports `resolvePrompt(template, { challenge, student, build })` —
+throws `MissingTokenError` rather than rendering blank, for any of the three
+namespaces, including an empty string or empty array (not just `undefined`/`null`).
+Array values (`filterIdeas`, `extraPages`) join into readable prose automatically.
+`findMissionForBuildKey(key)` looks up which mission's `inputs`/`postInputs` sets a
+given `build.*` key, for redirecting a student back to the right earlier mission with
+a plain explanation when a later one isn't startable yet — that redirect UI itself is
+commit 5's job, this just gives it the lookup. `extractTokens` pulls every token out
+of a string, for that same not-startable check.
+
+Verified with a standalone script mirroring the algorithm (`@/` aliases only resolve
+inside Next's webpack, not raw Node): array-join prose reads naturally, missing/empty
+string/empty array all throw, dynamic tokens inside mission titles resolve correctly.
+`npm run build` confirms the real file's `@/content/level-1/missions` import compiles.
+Build passes.
+
+Next: commit 4 (`/journey/level-1` challenge picker — nine cards, selection writes the
+`builds` row, change-challenge lock after mission 02).
