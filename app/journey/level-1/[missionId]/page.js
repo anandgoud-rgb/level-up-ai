@@ -104,6 +104,7 @@ export default async function Level1MissionPage({ params }) {
   }
 
   const nextMission = level1.missions[missionIndex + 1] ?? null;
+  const previousMission = level1.missions[missionIndex - 1] ?? null;
 
   return (
     <Level1MissionRunner
@@ -118,6 +119,7 @@ export default async function Level1MissionPage({ params }) {
       savedArtifact={progressRow?.artifact ?? {}}
       savedStatus={progressRow?.status ?? "in_progress"}
       nextMissionId={nextMission?.id ?? null}
+      previousMissionId={previousMission?.id ?? null}
       levelXp={level1.xp}
       completionMessage={level1.completionMessage}
     />

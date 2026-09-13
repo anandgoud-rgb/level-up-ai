@@ -402,6 +402,15 @@ routes to the previous mission. Layout: Back is a secondary (white/border) butto
 the left, Continue stays the primary (volt) button on the right, both `justify-end`
 inside the row so Continue anchors right even solo on a level's first mission — a
 small consistency change from Continue's previous left-aligned default. On mobile the
-buttons stack with Continue on top (`flex-col-reverse`). Not yet extended to
-`Level1MissionRunner.js` — this session only touched the Pre-Level runner. Build
-passes; not live-tested in a browser session.
+buttons stack with Continue on top (`flex-col-reverse`). Build passes; not live-tested
+in a browser session.
+
+**Session 7 — Level 1 runner: same back navigation**
+Extended the identical pattern to `Level1MissionRunner.js` /
+`app/journey/level-1/[missionId]/page.js`: `previousMissionId` resolved and passed
+through, Back button (same left/secondary, hidden on mission 1) added next to
+Continue. `handleBack` saves both `builds.answers` (via `persistAnswers`, `lock`
+always `false` — going back never sets or clears `locked_at`) and `mission_progress`
+(via `persistProgress`, same done/xp-preserving logic as `handleAnswerBlur`/
+`handleProofBlur`) before routing to the previous mission. Build passes; not
+live-tested in a browser session — recommend a click-through before students hit it.

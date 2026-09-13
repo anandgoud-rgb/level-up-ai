@@ -145,6 +145,7 @@ export default function Level1MissionRunner({
   savedArtifact,
   savedStatus,
   nextMissionId,
+  previousMissionId,
   levelXp,
   completionMessage,
 }) {
@@ -269,6 +270,16 @@ export default function Level1MissionRunner({
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setTimeout(() => router.push("/journey"), reduceMotion ? 50 : 1800);
+  }
+
+  async function handleBack() {
+    setSaving(true);
+    await Promise.all([
+      persistAnswers(answers, false),
+      persistProgress(status, status === "done" ? mission.xp : 0, proofValues),
+    ]);
+    setSaving(false);
+    router.push(`/journey/level-1/${previousMissionId}`);
   }
 
   function livePreview(template) {
@@ -434,16 +445,30 @@ export default function Level1MissionRunner({
           </div>
         ) : null}
 
-        <button
-          type="button"
-          onClick={handleContinue}
-          disabled={!canContinue || saving}
-          className="mt-8 w-full rounded-xl border-2 border-ink bg-volt px-6 py-4 font-display text-lg font-bold text-white shadow-lift transition
-                     hover:bg-voltDeep focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-volt/40
-                     active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-        >
-          {saving ? "Saving…" : "Continue"}
-        </button>
+        <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+          {previousMissionId ? (
+            <button
+              type="button"
+              onClick={handleBack}
+              disabled={saving}
+              className="w-full rounded-xl border-2 border-line bg-white px-6 py-4 font-display text-lg font-bold text-ink shadow-lift transition
+                         hover:bg-paper focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-volt/40
+                         active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 sm:mr-auto sm:w-auto"
+            >
+              Back
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={!canContinue || saving}
+            className="w-full rounded-xl border-2 border-ink bg-volt px-6 py-4 font-display text-lg font-bold text-white shadow-lift transition
+                       hover:bg-voltDeep focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-volt/40
+                       active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            {saving ? "Saving…" : "Continue"}
+          </button>
+        </div>
       </div>
 
       {reveal ? (
