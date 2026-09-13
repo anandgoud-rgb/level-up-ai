@@ -389,3 +389,19 @@ mission 1-9 playthrough before this reaches students.
 
 **Level 1 brief complete** — all 6 commits done: schema, content, resolver, picker,
 runner, rewards.
+
+**Session 7 — Pre-Level runner: back navigation**
+Added a "Back" button to the Pre-Level mission runner (`components/MissionRunner.js`),
+next to Continue. `app/journey/[levelId]/[missionId]/page.js` now also resolves
+`previousMission` (mirroring the existing `nextMission` lookup) and passes
+`previousMissionId` down. Only rendered when a previous mission exists (hidden on a
+level's first mission) — no disabled state. Clicking it saves current field values to
+`mission_progress` first (same as blur-autosave: keeps `done`/xp if already done,
+`in_progress`/0 otherwise, silent on failure per the existing save pattern), then
+routes to the previous mission. Layout: Back is a secondary (white/border) button on
+the left, Continue stays the primary (volt) button on the right, both `justify-end`
+inside the row so Continue anchors right even solo on a level's first mission — a
+small consistency change from Continue's previous left-aligned default. On mobile the
+buttons stack with Continue on top (`flex-col-reverse`). Not yet extended to
+`Level1MissionRunner.js` — this session only touched the Pre-Level runner. Build
+passes; not live-tested in a browser session.
