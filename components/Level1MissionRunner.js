@@ -166,6 +166,9 @@ export default function Level1MissionRunner({
   const [status, setStatus] = useState(savedStatus === "done" ? "done" : "in_progress");
   const [saving, setSaving] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [resetError, setResetError] = useState(false);
 
   const checklistKey = mission.checklist ? `checklist_${mission.id}` : null;
   const checklistState = checklistKey ? answers[checklistKey] || {} : {};
@@ -282,6 +285,30 @@ export default function Level1MissionRunner({
     router.push(`/journey/level-1/${previousMissionId}`);
   }
 
+  async function handleResetLevel() {
+    if (!supabaseReady || !supabase) return;
+    setResetting(true);
+    setResetError(false);
+    try {
+      const [{ error: progressError }, { error: buildError }] = await Promise.all([
+        supabase
+          .from("mission_progress")
+          .delete()
+          .eq("user_id", userId)
+          .eq("level_id", "level-1"),
+        supabase
+          .from("builds")
+          .update({ answers: {}, locked_at: null, updated_at: new Date().toISOString() })
+          .eq("user_id", userId),
+      ]);
+      if (progressError || buildError) throw progressError || buildError;
+      router.push("/journey");
+    } catch {
+      setResetting(false);
+      setResetError(true);
+    }
+  }
+
   function livePreview(template) {
     return template.replace(
       /{{\s*(challenge|student|build)\.([a-zA-Z0-9_]+)\s*}}/g,
@@ -311,16 +338,26 @@ export default function Level1MissionRunner({
   return (
     <main className="notebook min-h-screen">
       <div className="mx-auto max-w-2xl px-5 py-10 sm:px-8 sm:py-14">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-start justify-between gap-3">
           <Link
             href="/journey"
             className="font-body text-[13px] font-semibold text-inkSoft hover:text-ink"
           >
             &larr; Journey
           </Link>
-          <span className="font-body text-[13px] font-medium text-inkSoft">
-            Mission {missionIndex + 1} of {missionsTotal}
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            <span className="font-body text-[13px] font-medium text-inkSoft">
+              Mission {missionIndex + 1} of {missionsTotal}
+            </span>
+            <button
+              type="button"
+              onClick={() => setConfirmingReset(true)}
+              disabled={saving}
+              className="font-body text-[12px] font-medium text-inkSoft underline decoration-line underline-offset-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Reset level
+            </button>
+          </div>
         </div>
 
         <p className="font-display text-sm font-bold tracking-tight text-volt">
@@ -498,6 +535,48 @@ export default function Level1MissionRunner({
                 {completionMessage}
               </p>
             ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      {confirmingReset ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/90 px-5">
+          <div className="w-full max-w-sm rounded-3xl border-2 border-ink bg-white p-8 shadow-card">
+            <h2 className="font-display text-xl font-extrabold text-ink">
+              Reset this level?
+            </h2>
+            <p className="mt-3 font-body text-[14px] leading-relaxed text-inkSoft">
+              This clears every mission in Level 1 — your answers, progress, and XP
+              from it. You&rsquo;ll keep the same challenge and start it over from
+              mission 1. This can&rsquo;t be undone.
+            </p>
+            {resetError ? (
+              <p className="mt-3 font-body text-[13px] font-semibold text-ink">
+                Couldn&rsquo;t reset the level. Try again.
+              </p>
+            ) : null}
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setConfirmingReset(false)}
+                disabled={resetting}
+                className="w-full rounded-xl border-2 border-line bg-white px-5 py-3 font-display text-sm font-bold text-ink shadow-lift transition
+                           hover:bg-paper focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-volt/40
+                           active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleResetLevel}
+                disabled={resetting}
+                className="w-full rounded-xl border-2 border-ink bg-marigold px-5 py-3 font-display text-sm font-bold text-ink shadow-lift transition
+                           hover:brightness-95 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-volt/40
+                           active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
+                {resetting ? "Resetting…" : "Reset level"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

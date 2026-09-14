@@ -95,6 +95,11 @@ drop policy if exists "own progress update" on public.mission_progress;
 create policy "own progress update" on public.mission_progress
   for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+-- Lets a student reset a level: wipes their mission_progress rows for it.
+drop policy if exists "own progress delete" on public.mission_progress;
+create policy "own progress delete" on public.mission_progress
+  for delete using (auth.uid() = user_id);
+
 create index if not exists mission_progress_user_level
   on public.mission_progress (user_id, level_id);
 

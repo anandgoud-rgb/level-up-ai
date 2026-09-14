@@ -414,3 +414,29 @@ always `false` — going back never sets or clears `locked_at`) and `mission_pro
 (via `persistProgress`, same done/xp-preserving logic as `handleAnswerBlur`/
 `handleProofBlur`) before routing to the previous mission. Build passes; not
 live-tested in a browser session — recommend a click-through before students hit it.
+
+**Session 7 — Reset level (both runners)**
+Added a quiet "Reset level" text link in each mission runner's header (next to the
+"Mission X of N" counter), opening a confirm modal before doing anything destructive
+— same button-language convention as Continue/Back, but the confirm action uses
+`marigold` (not `volt`) so it doesn't read as the "good" choice, and the copy says
+plainly it can't be undone.
+
+- **Pre-Level** (`components/MissionRunner.js`): deletes all `mission_progress` rows
+  for `(user_id, level_id)`, then routes to `/journey`.
+- **Level 1** (`components/Level1MissionRunner.js`): deletes `mission_progress` rows
+  for `level_id = "level-1"` and resets the student's `builds` row (`answers` back to
+  `{}`, `locked_at` back to `null`) — keeps the same `challenge_id` rather than
+  sending them back to the picker, per owner's call.
+
+Unlike the existing autosave pattern (which fails silently since a missed autosave
+just retries on the next blur), a failed reset shows an inline "Couldn't reset the
+level. Try again." and leaves the modal open — silently pretending a delete succeeded
+would be misleading for a destructive, user-initiated action.
+
+**Requires a Supabase migration the owner needs to run**: `mission_progress` had no
+delete policy before this, so `supabase/schema.sql` gained one — "own progress
+delete", `for delete using (auth.uid() = user_id)`. The `builds` table needed no
+schema change (reset there is a plain `update`, covered by its existing update
+policy). Resetting will fail under RLS in production until the owner re-runs
+`schema.sql` in the Supabase SQL editor. Build passes; not live-tested.
